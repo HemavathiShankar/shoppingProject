@@ -1,0 +1,11 @@
+spring:
+  datasource:
+     url: jdbc:h2:mem:order
+     username: sa
+     password: passward
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  
+   
+  application:
+    name: ORDER-SERVICE

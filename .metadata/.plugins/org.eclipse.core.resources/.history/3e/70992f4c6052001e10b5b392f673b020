@@ -1,0 +1,47 @@
+package com.example.orderservice;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.client.RestTemplate;
+
+import com.example.orderservice.external.client.PaymentService;
+import com.example.orderservice.external.client.ProductService;
+import com.example.orderservice.repo.OrderRepo;
+import com.example.orderservice.service.OrderServiceImpl;
+import com.example.orderservice.service.OrderService;
+
+@SpringBootTest
+public class OrderserviceImplTest {
+	@Mock
+	private OrderRepo repo;
+	
+	@Mock
+	private ProductService productService;
+	
+	@Mock
+	private PaymentService paymentservice;
+	
+	@Mock
+	private RestTemplate restTemplate;
+	
+	@InjectMocks
+	OrderService orderService=new OrderServiceImpl();
+	
+	@DisplayName("get order-success scenario");
+	@Test
+	void test_when_Order_Success() {
+		//mocking
+		//Actual
+		//verify
+		//assert
+		
+		
+	}
+	
+	
+	
+
+}

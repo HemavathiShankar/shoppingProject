@@ -1,0 +1,43 @@
+package com.example.productservice;
+
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import com.example.productservice.entity.Product;
+import com.example.productservice.model.ProductBody;
+import com.example.productservice.repository.ProductRepository;
+import com.example.productservice.service.ProductService;
+import com.example.productservice.service.ProductServiceImpl;
+
+@SpringBootTest
+class ProductServiceApplicationTests {
+	@Mock
+	private ProductRepository repo;
+	@InjectMocks
+	ProductService service=new ProductServiceImpl();
+	
+	@Test
+	void test_add_product() {
+		Product product=getProductEntity();
+		ProductBody body=getProductBody();
+		when(repo.save(product)).thenReturn(anyLong());
+		service.addProduct(Product);
+	}
+
+	private ProductBody getProductBody() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Product getProductEntity() {
+		// TODO Auto-generated method stub
+		return Product.builder().price(1000).productId(101).productName("vivo").quantity(5).build();
+	}
+
+}

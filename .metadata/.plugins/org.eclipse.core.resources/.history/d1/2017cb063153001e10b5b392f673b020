@@ -1,0 +1,109 @@
+package com.example.orderservice;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.Instant;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.client.RestTemplate;
+
+import com.example.orderservice.entity.Order;
+import com.example.orderservice.external.client.PaymentService;
+import com.example.orderservice.external.client.ProductService;
+import com.example.orderservice.external.exceptions.CustomOrderException;
+import com.example.orderservice.model.OrderResponse;
+import com.example.orderservice.model.PaymentMode;
+import com.example.orderservice.model.PaymentRequest;
+import com.example.orderservice.model.ProductBody;
+import com.example.orderservice.repo.OrderRepo;
+import com.example.orderservice.service.OrderService;
+import com.example.orderservice.service.OrderServiceImpl;
+import com.google.common.base.Optional;
+
+@SpringBootTest
+class OrderServiceApplicationTests {
+
+	@Mock
+	private OrderRepo repo;
+	
+	@Mock
+	private ProductService productService;
+	
+	@Mock
+	private PaymentService paymentService;
+	
+	@Mock
+	private RestTemplate restTemplate;
+	
+	@InjectMocks
+	OrderService service=new OrderServiceImpl();
+	
+	@Test
+	void get_order_test_success() {
+		Order order=getMockOrder();
+		ProductBody pro=mockProductResponse();
+		PaymentRequest pay=mockPaymentReq();
+		//mocking
+		when(repo.findById(anyLong())).thenReturn(java.util.Optional.of(order));
+		
+		when(restTemplate.getForObject("http://PRODUCT-SERVICE/product/getProducts/"+order.
+				getProductId(),ProductBody.class)).thenReturn(pro);
+		
+		when(restTemplate.getForObject("http://PAYMENT-SERVICE/payment/getPaymentByOrderId/"
+		+order.getId(),PaymentRequest.class)).thenReturn(pay);
+		//actual
+		OrderResponse ordBody=service.getOrderDetails(1);
+		//verification
+		verify(repo,times(1)).findById(anyLong());
+		verify(restTemplate,times(1)).getForObject("http://PRODUCT-SERVICE/product/getProducts/"+order.
+				getProductId(),ProductBody.class);
+		verify(restTemplate,times(1)).getForObject("http://PAYMENT-SERVICE/payment/getPaymentByOrderId/"
+				+order.getId(),PaymentRequest.class);
+		//assertiion
+		assertNotNull(ordBody);
+		assertEquals(order.getId(), ordBody.getOrderId());
+		
+		
+		
+	}
+
+	private PaymentRequest mockPaymentReq() {
+		// TODO Auto-generated method stub
+		return PaymentRequest.builder().amount(2000).paymentMode(PaymentMode.CASH).orderId(1).build();
+	}
+
+	private ProductBody mockProductResponse() {
+		// TODO Auto-generated method stub
+		return ProductBody.builder().price(1000).quantity(5).productName("vivo").productId(101).build();
+	}
+
+	private Order getMockOrder() {
+		// TODO Auto-generated method stub
+		return Order.builder().amount(1000).productId(101).
+				orderDate(Instant.now()).orderStatus("placed").quantity(5).build();
+	}
+	
+	@Test
+	void order_Not_found_failure_scenario() {
+		when(repo.findById(anyLong())).thenReturn(null);
+		assertThrows(CustomOrderException.class,()->service.getOrderDetails(1) );
+	}
+		
+		
+		
+		
+
+
+}

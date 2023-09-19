@@ -1,0 +1,79 @@
+package com.example.orderservice;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+
+import java.time.Instant;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.client.RestTemplate;
+
+import com.example.orderservice.entity.Order;
+import com.example.orderservice.external.client.PaymentService;
+import com.example.orderservice.external.client.ProductService;
+import com.example.orderservice.external.exceptions.CustomOrderException;
+import com.example.orderservice.repo.OrderRepo;
+import com.example.orderservice.service.OrderServiceImpl;
+import com.google.common.base.Optional;
+import com.example.orderservice.service.OrderService;
+
+@SpringBootTest
+public class OrderserviceImplTest {
+	@Mock
+	private OrderRepo repo;
+	
+	@Mock
+	private ProductService productService;
+	
+	@Mock
+	private PaymentService paymentservice;
+	
+	@Mock
+	private RestTemplate restTemplate;
+	
+	@InjectMocks
+	OrderService orderService=new OrderServiceImpl();
+	
+	@Test
+	void test_getOrder_FailureScenario() {
+		when(repo.findById(anyLong())).thenReturn(null);
+		CustomOrderException exception=assertThrows(CustomOrderException.class,
+				()->orderService.getOrderDetails(1));
+		assertEquals(404, exception.getStatus());
+	}
+	
+	@DisplayName("get order-success scenario");
+	@Test
+	void test_when_Order_Success() {
+		//mocking
+		//Actual
+		//verify
+		//assert
+		Order order=getMockOrder();
+		//mocking
+		when(repo.findById((anyLong()))).thenReturn(Optional.of(order));
+		when(restTemplate.getForObject(null, null))
+		//actual
+	orderService.getOrderDetails(1)	;
+	//verify
+		
+		
+	}
+
+	private Order getMockOrder() {
+		// TODO Auto-generated method stub
+		return Order.builder().amount(200).orderDate(Instant.now()).id(1)
+				.productId(101).orderStatus("created").quantity(2).build();
+	}
+	
+	
+	
+
+}

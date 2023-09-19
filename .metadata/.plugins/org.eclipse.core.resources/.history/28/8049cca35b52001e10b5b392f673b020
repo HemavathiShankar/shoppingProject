@@ -1,0 +1,11 @@
+package com.example.orderservice;
+
+
+
+@SpringBootTest
+public class OrderserviceImplTest {
+	
+	
+	
+
+}
